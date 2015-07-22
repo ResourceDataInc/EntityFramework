@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using JetBrains.Annotations;
+using Microsoft.Data.Entity.Internal;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Query.Expressions;
 using Microsoft.Data.Entity.Query.ExpressionVisitors;
@@ -15,6 +16,8 @@ using Microsoft.Data.Entity.Utilities;
 using Remotion.Linq;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Clauses.Expressions;
+using Microsoft.Data.Entity.Query.Sql;
+using Microsoft.Data.Entity.Query.Internal;
 
 namespace Microsoft.Data.Entity.Query
 {
@@ -111,6 +114,16 @@ namespace Microsoft.Data.Entity.Query
 
             return _projectionVisitor
                 = new RelationalProjectionExpressionVisitor(this, querySource);
+        }
+
+        protected override List<IConstantPrinter> GetConstantPrinters()
+        {
+            return new List<IConstantPrinter>
+            {
+                new CommandBuilderPrinter(),
+                new EntityTrackingInfoListPrinter(),
+                new  MetadataPropertyCollectionPrinter(),
+            }.Concat(base.GetConstantPrinters()).ToList();
         }
 
         public override void VisitQueryModel(QueryModel queryModel)

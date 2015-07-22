@@ -12,6 +12,7 @@ using Microsoft.Data.Entity.Internal;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Query.Annotations;
 using Microsoft.Data.Entity.Query.ExpressionVisitors;
+using Microsoft.Data.Entity.Query.Internal;
 using Microsoft.Data.Entity.Utilities;
 using Microsoft.Framework.Logging;
 using Remotion.Linq;
@@ -104,6 +105,15 @@ namespace Microsoft.Data.Entity.Query
 
                 return CreateExecutorLambda<IEnumerable<TResult>>();
             }
+        }
+
+        protected virtual List<IConstantPrinter> GetConstantPrinters()
+        {
+            return new List<IConstantPrinter>
+            {
+                new CollectionConstantPrinter(),
+                new DefaultConstantPrinter()
+            };
         }
 
         public virtual Func<QueryContext, IAsyncEnumerable<TResult>> CreateAsyncQueryExecutor<TResult>([NotNull] QueryModel queryModel)
@@ -413,15 +423,15 @@ namespace Microsoft.Data.Entity.Query
 
         protected virtual Func<QueryContext, TResults> CreateExecutorLambda<TResults>()
         {
-            var queryExecutor
-                = Expression
+            var queryExecutorExpression =
+                Expression
                     .Lambda<Func<QueryContext, QueryResultScope, TResults>>(
-                        _expression, QueryContextParameter, QueryResultScopeParameter)
-                    .Compile();
+                        _expression, QueryContextParameter, QueryResultScopeParameter);
 
-            // TODO: Format expression in log (query plan)
-            QueryCompilationContext.Logger
-                .LogInformation(_expression, _ => Strings.LogCompiledQueryFunction);
+            QueryCompilationContext.Logger.LogInformation(() =>
+                new ExpressionPrinter().Print(queryExecutorExpression, GetConstantPrinters()));
+
+            var queryExecutor = queryExecutorExpression.Compile();
 
             return qc => queryExecutor(qc, null);
         }
