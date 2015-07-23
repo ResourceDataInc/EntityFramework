@@ -71,6 +71,7 @@
     <Compile Include="Internal\IndentedStringBuilder.cs" />
     <Compile Include="Internal\LazyRef.cs" />
     <Compile Include="Internal\ModelForeignKeyUndirectedGraphAdapter.cs" />
+    <Compile Include="Internal\ModelBaseTypeGraphAdapter.cs" />
     <Compile Include="Internal\ModelNavigationsGraphAdapter.cs" />
     <Compile Include="Internal\Multigraph.cs" />
     <Compile Include="Internal\PropertyListComparer.cs" />

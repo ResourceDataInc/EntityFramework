@@ -145,11 +145,10 @@ builder.Entity(""Microsoft.Data.Entity.Commands.Migrations.ModelSnapshotTest+Bas
 
 builder.Entity(""Microsoft.Data.Entity.Commands.Migrations.ModelSnapshotTest+DerivedEntity"", b =>
     {
+        b.BaseType(""Microsoft.Data.Entity.Commands.Migrations.ModelSnapshotTest+BaseEntity"");
+
         b.Property<string>(""Name"");
     });
-
-builder.Entity(""Microsoft.Data.Entity.Commands.Migrations.ModelSnapshotTest+DerivedEntity"")
-    .BaseType(""Microsoft.Data.Entity.Commands.Migrations.ModelSnapshotTest+BaseEntity"");
 ",
                 o =>
                     {
