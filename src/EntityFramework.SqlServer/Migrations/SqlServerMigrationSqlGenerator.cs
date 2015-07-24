@@ -10,6 +10,7 @@ using Microsoft.Data.Entity.Migrations.Operations;
 using Microsoft.Data.Entity.Migrations.Sql;
 using Microsoft.Data.Entity.SqlServer.Metadata;
 using Microsoft.Data.Entity.SqlServer.Migrations;
+using Microsoft.Data.Entity.Storage;
 using Microsoft.Data.Entity.Update;
 using Microsoft.Data.Entity.Utilities;
 
@@ -19,8 +20,10 @@ namespace Microsoft.Data.Entity.SqlServer
     {
         private readonly ISqlServerUpdateSqlGenerator _sql;
 
-        public SqlServerMigrationSqlGenerator([NotNull] ISqlServerUpdateSqlGenerator sqlGenerator)
-            : base(Check.NotNull(sqlGenerator, nameof(sqlGenerator)))
+        public SqlServerMigrationSqlGenerator(
+            [NotNull] ISqlServerUpdateSqlGenerator sqlGenerator,
+            [NotNull] IRelationalTypeMapper typeMapper)
+            : base(sqlGenerator, typeMapper)
         {
             _sql = sqlGenerator;
         }

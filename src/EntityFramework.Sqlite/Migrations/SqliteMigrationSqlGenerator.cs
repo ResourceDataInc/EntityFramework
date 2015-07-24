@@ -9,6 +9,7 @@ using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Migrations.Operations;
 using Microsoft.Data.Entity.Migrations.Sql;
 using Microsoft.Data.Entity.Sqlite.Metadata;
+using Microsoft.Data.Entity.Storage;
 using Microsoft.Data.Entity.Update;
 using Microsoft.Data.Entity.Utilities;
 
@@ -18,8 +19,10 @@ namespace Microsoft.Data.Entity.Sqlite.Migrations
     {
         private readonly IUpdateSqlGenerator _sql;
 
-        public SqliteMigrationSqlGenerator([NotNull] IUpdateSqlGenerator sqlGenerator)
-            : base(sqlGenerator)
+        public SqliteMigrationSqlGenerator(
+            [NotNull] IUpdateSqlGenerator sqlGenerator,
+            [NotNull] IRelationalTypeMapper typeMapper)
+            : base(sqlGenerator, typeMapper)
         {
             _sql = sqlGenerator;
         }
@@ -71,20 +74,20 @@ namespace Microsoft.Data.Entity.Sqlite.Migrations
         }
 
         public override void ColumnDefinition(
-            string schema, 
-            string table, 
-            string name, 
-            string type, 
-            bool nullable, 
-            object defaultValue, 
+            string schema,
+            string table,
+            string name,
+            string type,
+            bool nullable,
+            object defaultValue,
             string defaultValueSql,
-            string computedColumnSql, 
-            IAnnotatable annotatable, 
-            IModel model, 
+            string computedColumnSql,
+            IAnnotatable annotatable,
+            IModel model,
             SqlBatchBuilder builder)
         {
             base.ColumnDefinition(
-                schema, table, name, type, nullable, 
+                schema, table, name, type, nullable,
                 defaultValue, defaultValueSql, computedColumnSql, annotatable, model, builder);
 
             var columnAnnotation = annotatable as Annotatable;

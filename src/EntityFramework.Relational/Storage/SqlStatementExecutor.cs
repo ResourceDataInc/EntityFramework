@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Internal;
+using Microsoft.Data.Entity.Storage.Commands;
 using Microsoft.Data.Entity.Utilities;
 using Microsoft.Framework.Logging;
 
@@ -27,30 +28,65 @@ namespace Microsoft.Data.Entity.Storage
 
         protected virtual ILogger Logger => _logger.Value;
 
+        public virtual void ExecuteNonQuery(
+            [NotNull] IRelationalConnection connection,
+            [NotNull] RelationalCommand relationalCommand)
+            => ExecuteNonQuery(connection, new[] { relationalCommand });
+
+        public virtual void ExecuteNonQuery(
+            [NotNull] IRelationalConnection connection,
+            [NotNull] IEnumerable<RelationalCommand> relationalCommands)
+        {
+            Check.NotNull(connection, nameof(connection));
+            Check.NotNull(relationalCommands, nameof(relationalCommands));
+
+            Execute(
+                connection,
+                () =>
+                {
+                    foreach (var relationalCommand in relationalCommands)
+                    {
+                        var command = relationalCommand.CreateDbCommand(connection);
+                        Logger.LogCommand(command);
+
+                        command.ExecuteNonQuery();
+                    }
+                    return null;
+                });
+        }
+
         public virtual Task ExecuteNonQueryAsync(
-            IRelationalConnection connection,
-            DbTransaction transaction,
-            IEnumerable<SqlBatch> sqlBatches,
+            [NotNull] IRelationalConnection connection,
+            [NotNull] RelationalCommand relationalCommand,
+            CancellationToken cancellationToken = default(CancellationToken))
+            => ExecuteNonQueryAsync(connection, new[] { relationalCommand }, cancellationToken);
+
+        public virtual Task ExecuteNonQueryAsync(
+            [NotNull] IRelationalConnection connection,
+            [NotNull] IEnumerable<RelationalCommand> relationalCommands,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             Check.NotNull(connection, nameof(connection));
-            Check.NotNull(sqlBatches, nameof(sqlBatches));
+            Check.NotNull(relationalCommands, nameof(relationalCommands));
 
             return ExecuteAsync(
                 connection,
                 async () =>
+                {
+                    foreach (var relationalCommand in relationalCommands)
                     {
-                        foreach (var sqlBatch in sqlBatches)
-                        {
-                            var command = sqlBatch.CreateCommand(connection, transaction);
-                            Logger.LogCommand(command);
+                        var command = relationalCommand.CreateDbCommand(connection);
+                        Logger.LogCommand(command);
 
-                            await command.ExecuteNonQueryAsync(cancellationToken);
-                        }
-                        return Task.FromResult<object>(null);
-                    },
+                        await command.ExecuteNonQueryAsync(cancellationToken);
+                    }
+                    return Task.FromResult<object>(null);
+                },
                 cancellationToken);
         }
+
+
+
 
         public virtual Task<object> ExecuteScalarAsync(
             IRelationalConnection connection,
@@ -92,28 +128,9 @@ namespace Microsoft.Data.Entity.Storage
             }
         }
 
-        public virtual void ExecuteNonQuery(
-            IRelationalConnection connection,
-            DbTransaction transaction,
-            IEnumerable<SqlBatch> sqlBatches)
-        {
-            Check.NotNull(connection, nameof(connection));
-            Check.NotNull(sqlBatches, nameof(sqlBatches));
 
-            Execute(
-                connection,
-                () =>
-                    {
-                        foreach (var sqlBatch in sqlBatches)
-                        {
-                            var command = sqlBatch.CreateCommand(connection, transaction);
-                            Logger.LogCommand(command);
 
-                            command.ExecuteNonQuery();
-                        }
-                        return null;
-                    });
-        }
+
 
         public virtual object ExecuteScalar(
             IRelationalConnection connection,

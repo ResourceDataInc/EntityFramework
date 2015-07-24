@@ -3,7 +3,6 @@
 
 using System.IO;
 using JetBrains.Annotations;
-using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Migrations.Infrastructure;
 using Microsoft.Data.Entity.Migrations.Sql;
@@ -48,7 +47,7 @@ namespace Microsoft.Data.Entity.Sqlite
         {
             var operations = _modelDiffer.GetDifferences(null, Model);
             var statements = _migrationSqlGenerator.Generate(operations, Model);
-            _executor.ExecuteNonQuery(_connection, null, statements);
+            _executor.ExecuteNonQuery(_connection, statements);
         }
 
         public override bool Exists() => true;

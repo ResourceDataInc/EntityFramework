@@ -12,7 +12,10 @@ namespace Microsoft.Data.Entity.Sqlite.Migrations
 {
     public class SqliteMigrationSqlGeneratorTest : MigrationSqlGeneratorTestBase
     {
-        protected override IMigrationSqlGenerator SqlGenerator => new SqliteMigrationSqlGenerator(new SqliteUpdateSqlGenerator());
+        protected override IMigrationSqlGenerator SqlGenerator
+            => new SqliteMigrationSqlGenerator(
+                new SqliteUpdateSqlGenerator(),
+                new SqliteTypeMapper());
 
         [Fact]
         public virtual void DefaultValue_formats_literal_correctly()
