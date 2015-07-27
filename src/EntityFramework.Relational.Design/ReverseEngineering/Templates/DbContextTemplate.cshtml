@@ -3,6 +3,7 @@
 @using System.Text
 @using Microsoft.Data.Entity.Relational.Design.ReverseEngineering.Configuration
 @using Microsoft.Data.Entity.Relational.Design.Utilities
+@using Microsoft.Data.Entity.Relational.Design.Extentions
 @using Microsoft.Data.Entity.Metadata
 @functions
 {
@@ -53,7 +54,7 @@
         sb.Append(" => ");
         sb.Append(dependentEndLambdaIdentifier);
         sb.Append(".");
-        sb.Append(rc.DependentEndNavigationPropertyName);
+        sb.Append(rc.DependentEndNavigationPropertyName.Replace("_", ""));
         sb.Append(")");
 
         if (rc.ForeignKey.IsUnique)
@@ -70,7 +71,7 @@
             sb.Append(" => ");
             sb.Append(principalEndLambdaIdentifier);
             sb.Append(".");
-            sb.Append(rc.PrincipalEndNavigationPropertyName);
+            sb.Append(rc.PrincipalEndNavigationPropertyName.Replace("_", ""));
         }
         sb.Append(")");
 
@@ -121,7 +122,7 @@ var firstEntity = true;
 @:
     }
     firstEntity = false;
-@:            modelBuilder.Entity<@entityConfig.EntityType.DisplayName()>(entity =>
+@:            modelBuilder.Entity<@entityConfig.EntityType.DisplayName().Replace("_", "")>(entity =>
 @:            {
     var firstEntityFacet = true;
     @foreach (var entityFacet in entityConfig.FacetConfigurations)
@@ -149,12 +150,12 @@ var firstEntity = true;
         {
             @foreach (var line in propertyConfigurationLines)
             {
-@:                entity.Property(e => e.@(propertyConfig.Property.Name))@(line);
+@:                entity.Property(e => e.@((propertyConfig.Property as IProperty).PropertyName()))@(line);
             }
         }
         else
         {
-@:                entity.Property(e => e.@(propertyConfig.Property.Name))
+@:                entity.Property(e => e.@((propertyConfig.Property as IProperty).PropertyName()))
             var lineCount = 0;
             @foreach (string line in propertyConfigurationLines)
             {
@@ -183,7 +184,7 @@ var firstEntity = true;
 
 @foreach (var et in Model.Helper.OrderedEntityTypes())
 {
-@:        public virtual DbSet<@et.Name> @et.Name { get; set; }
+@:        public virtual DbSet<@et.Name.Replace("_", "")> @et.Name.Replace("_", "") { get; set; }
 }
     }
 }

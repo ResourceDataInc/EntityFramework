@@ -1,5 +1,7 @@
 @inherits Microsoft.Data.Entity.Relational.Design.Templating.RazorReverseEngineeringBase
+@using Microsoft.Data.Entity.Metadata
 @using Microsoft.Data.Entity.Relational.Design.ReverseEngineering.Configuration
+@using Microsoft.Data.Entity.Relational.Design.Extentions
 @{
     string errorMessageAnnotation = Model.Helper.ErrorMessageAnnotation;
 }@if (errorMessageAnnotation != null) {
@@ -13,22 +15,22 @@ else {
 @:
 @:namespace @Model.Namespace
 @:{
-@:    public class @Model.EntityType.Name
+@:    public partial class @Model.EntityType.Name.Replace("_", "")
 @:    {
     @* dnxcore50 requires this be cast, similarly below *@
     @if ((int)(Model.Helper.NavPropInitializers.Count) > 0) {
-@:        public @(Model.EntityType.Name)()
+@:        public @(Model.EntityType.Name.Replace("_", ""))()
 @:        {
         @foreach (var navPropInitializer in Model.Helper.NavPropInitializers)
         {
-@:            @navPropInitializer.NavigationPropertyName = new HashSet<@navPropInitializer.PrincipalEntityTypeName>();
+@:            @navPropInitializer.NavigationPropertyName.Replace("_", "") = new HashSet<@navPropInitializer.PrincipalEntityTypeName.Replace("_", "")>();
         }
 @:        }
 @:
     }
     @foreach (var property in Model.Helper.OrderedEntityProperties)
     {
-@:        public @Model.Generator.CSharpCodeGeneratorHelper.GetTypeName(property.ClrType) @property.Name { get; set; }
+@:        public @Model.Generator.CSharpCodeGeneratorHelper.GetTypeName(property.ClrType) @((property as IProperty).PropertyName()) { get; set; }
     }
     @if ((int)(Model.Helper.NavigationProperties.Count) > 0)
     {
@@ -41,7 +43,7 @@ else {
             }
             else
             {
-@:        public virtual @navProp.Type @navProp.Name { get; set; }
+@:        public virtual @navProp.Type.Replace("_", "") @navProp.Name.Replace("_", "") { get; set; }
             }
         }
     }

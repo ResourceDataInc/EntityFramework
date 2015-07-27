@@ -162,8 +162,7 @@ namespace Microsoft.Data.Entity.Relational.Design.ReverseEngineering
                             CSharpUtilities.Instance.DelimitString(ExtensionsProvider.For(entityType).TableName),
                             CSharpUtilities.Instance.DelimitString(ExtensionsProvider.For(entityType).Schema))));
             }
-            else if (ExtensionsProvider.For(entityType).TableName != null
-                     && ExtensionsProvider.For(entityType).TableName != entityType.DisplayName())
+            else if (ExtensionsProvider.For(entityType).TableName != null)
             {
                 entityConfiguration.FacetConfigurations.Add(
                     new FacetConfiguration(
@@ -269,16 +268,13 @@ namespace Microsoft.Data.Entity.Relational.Design.ReverseEngineering
         {
             Check.NotNull(propertyConfiguration, nameof(propertyConfiguration));
 
-            if (ExtensionsProvider.For(propertyConfiguration.Property).ColumnName != null
-                && ExtensionsProvider.For(propertyConfiguration.Property).ColumnName != propertyConfiguration.Property.Name)
-            {
-                propertyConfiguration.AddFacetConfiguration(
-                    new FacetConfiguration(
-                        string.Format(CultureInfo.InvariantCulture,
-                            "HasColumnName({0})",
-                            CSharpUtilities.Instance.DelimitString(
-                                ExtensionsProvider.For(propertyConfiguration.Property).ColumnName))));
-            }
+            propertyConfiguration.AddFacetConfiguration(
+                new FacetConfiguration(
+                    string.Format(CultureInfo.InvariantCulture,
+                        "HasColumnName({0})",
+                        CSharpUtilities.Instance.DelimitString(
+                            ExtensionsProvider.For(propertyConfiguration.Property).ColumnName))));
+            
         }
 
         public virtual void AddColumnTypeFacetConfiguration(

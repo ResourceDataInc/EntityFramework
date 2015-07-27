@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using Microsoft.Data.Entity.Metadata;
+using Microsoft.Data.Entity.Relational.Design.Extentions;
 using Microsoft.Data.Entity.Relational.Design.ReverseEngineering.Configuration;
 using Microsoft.Data.Entity.Utilities;
 
@@ -26,12 +27,12 @@ namespace Microsoft.Data.Entity.Relational.Design.Utilities
             if (properties.Count() > 1)
             {
                 sb.Append("new { ");
-                sb.Append(string.Join(", ", properties.Select(p => lambdaIdentifier + "." + p.Name)));
+                sb.Append(string.Join(", ", properties.Select(p => lambdaIdentifier + "." + p.PropertyName())));
                 sb.Append(" }");
             }
             else
             {
-                sb.Append(lambdaIdentifier + "." + properties.ElementAt(0).Name);
+                sb.Append(lambdaIdentifier + "." + properties.ElementAt(0).PropertyName());
             }
 
             return sb.ToString();

@@ -18,7 +18,7 @@ namespace Microsoft.Data.Entity.Metadata
             Name = name;
         }
 
-        public virtual string Name { get; }
+        public virtual string Name { get; set; }
 
         // TODO: Consider properties that are part of some complex/value type
         // Issue #246

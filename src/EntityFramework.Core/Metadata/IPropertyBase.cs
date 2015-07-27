@@ -7,7 +7,7 @@ namespace Microsoft.Data.Entity.Metadata
 {
     public interface IPropertyBase : IAnnotatable
     {
-        string Name { get; }
+        string Name { get; set; }
         IEntityType DeclaringEntityType { get; }
     }
 }

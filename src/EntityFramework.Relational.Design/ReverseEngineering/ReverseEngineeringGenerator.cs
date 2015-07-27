@@ -100,7 +100,7 @@ namespace Microsoft.Data.Entity.Relational.Design.ReverseEngineering
             // output DbContext .cs file
             var dbContextFileName = dbContextClassName + FileExtension;
             var dbContextFileFullPath = FileService.OutputFile(
-                outputPath, dbContextFileName, templateResult.GeneratedText);
+                outputPath + "/Models", dbContextFileName, templateResult.GeneratedText);
             resultingFiles.Add(dbContextFileFullPath);
 
             var entityTypeTemplate = LoadTemplate(configuration.CustomTemplatePath,
@@ -125,10 +125,18 @@ namespace Microsoft.Data.Entity.Relational.Design.ReverseEngineering
                         Strings.ErrorRunningEntityTypeTemplate(templateResult.ProcessingException.Message));
                 }
 
+                var entitySchema = entityType.Annotations.FirstOrDefault(x => x.Name == "Relational:Schema")?.Value as string;
+                var outputPathModels = outputPath + "/Models";
+
+                if (entitySchema != null && entitySchema != "dbo")
+                {
+                    outputPathModels = outputPathModels + "/" + entitySchema;
+                }
+
                 // output EntityType poco .cs file
-                var entityTypeFileName = entityType.DisplayName() + FileExtension;
+                var entityTypeFileName = entityType.DisplayName().Replace("_", "") + FileExtension;
                 var entityTypeFileFullPath = FileService.OutputFile(
-                    outputPath, entityTypeFileName, templateResult.GeneratedText);
+                    outputPathModels, entityTypeFileName, templateResult.GeneratedText);
                 resultingFiles.Add(entityTypeFileFullPath);
             }
 
